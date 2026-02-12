@@ -1,0 +1,61 @@
+---
+- hosts: db-server
+  become: true
+
+  tasks:
+    - name: Install PostgreSQL
+      community.general.apt_rpm:
+        name:
+          - postgresql16 
+          - postgresql16-server 
+          - postgresql16-contrib
+          - python3-module-psycopg2
+        state: present
+        update_cache: true
+
+    - name: Check if PostgreSQL is instialized
+      ansible.builtin.stat: 
+        path: "/var/lib/pgsql/data/pg_hba.conf"
+      register: postgres_data
+
+    - name: Initialize PostgreSQL
+      ansible.builtin.command:
+        cmd: su -l postgres -s /bin/sh -c "/usr/bin/initdb --pgdata=/var/lib/pgsql/data"
+      when: 
+        - not postgres_data.stat.exists
+
+    - name: Started and enabled PostgreSQL
+      ansible.builtin.systemd:
+        name: postgresql
+        state: started
+        enabled: true
+
+    - name: Create user 'cyberbackup'
+      community.postgresql.postgresql_user:
+        state: present
+        name: cyberbackup
+        password: cyberbackup
+        role_attr_flags: "SUPERUSER"
+        db: postgres
+      become: true
+      become_user: postgres
+
+    - name: Copy file postgresql.conf
+      ansible.builtin.template:
+        src: files/postgresql.conf
+        dest: /var/lib/pgsql/data/postgresql.conf
+      notify:
+        - Restarted PostgreSQL
+
+    - name: Copy file pg_hba.conf
+      ansible.builtin.template:
+        src: files/pg_hba.conf
+        dest: /var/lib/pgsql/data/pg_hba.conf
+      notify:
+        - Restarted PostgreSQL
+
+  handlers:
+    - name: Restarted PostgreSQL
+      ansible.builtin.systemd:
+        name: postgresql
+        state: restarted

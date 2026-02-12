@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Settings /etc/hosts file
+      ansible.builtin.copy:
+        src: files/hosts
+        dest: /etc/hosts
+
+    - name: Install packages
+      community.general.apt_rpm:
+        name:
+          - kernel-source-6.12
+          - kernel-headers-modules-6.12
+          - gcc
+          - make
+        state: present
+        update_cache: true

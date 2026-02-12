@@ -1,0 +1,11 @@
+all:
+  children:
+    proxy:
+      hosts:
+        haproxy01:
+
+    game:
+      hosts:
+        game01:
+        game02:
+        game03:

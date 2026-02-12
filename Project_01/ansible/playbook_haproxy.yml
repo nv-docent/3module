@@ -1,0 +1,36 @@
+---
+- hosts: proxy
+  become: true
+
+  tasks:
+    - name: Install HAProxy
+      community.general.apt_rpm:
+        name: haproxy
+        state: present
+        update_cache: true
+    
+    - name: Copy file 'haproxy.cfg'
+      ansible.builtin.copy:
+        src: files/haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg
+      notify:
+        - Restarted HAProxy
+
+    - name: Copy certificate for HAProxy
+      ansible.builtin.copy:
+        src: files/game.pem
+        dest: /var/lib/ssl/game.pem
+      notify:
+        - Restarted HAProxy
+
+    - name: Started and enabled HAProxy
+      ansible.builtin.systemd:
+        name: haproxy
+        state: restarted
+        enabled: true
+
+  handlers:
+    - name: Restarted HAProxy
+      ansible.builtin.systemd:
+        name: haproxy
+        state: restarted

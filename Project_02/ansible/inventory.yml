@@ -1,0 +1,5 @@
+all:
+  hosts:
+    acm-server:
+    db-server:
+    bar-agent01:

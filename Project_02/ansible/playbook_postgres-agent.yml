@@ -1,0 +1,8 @@
+---
+- hosts: db-server
+  become: true
+
+  tasks:
+    - name: Install PostgreSQL-agent
+      ansible.builtin.script:
+        cmd: files/CyberBackup_17_64-bit.x86_64 -a -i PostgreSqlAgentFeature --rain acm-server.au.team --login root --password toor --nodeps

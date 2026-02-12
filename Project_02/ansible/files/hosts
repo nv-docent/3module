@@ -1,0 +1,3 @@
+192.168.1.21    acm-server.au.team      acm-server
+192.168.1.22    db-server.au.team       db-server
+192.168.1.23    bar-agent01.au.team     bar-agent01

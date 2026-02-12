@@ -1,0 +1,8 @@
+---
+- hosts: bar-agent01
+  become: true
+
+  tasks:
+    - name: Install Linux-agent
+      ansible.builtin.script:
+        cmd: files/CyberBackup_17_64-bit.x86_64 -a -i BackupAndRecoveryAgent --rain acm-server.au.team --login root --password toor --nodeps
